@@ -1,37 +1,42 @@
 from selenium.webdriver.common.by import By
 from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 import test_data
+import test_url
 import pytest
 from conftest import fill_login_fields
 from conftest import driver
+import test_locators
 
 
 
 class TestAccountPage:
 
     def test_open_account_page(self,driver,fill_login_fields):
-        driver.get(test_data.url_main)
-        driver.find_element(By.XPATH, ".//button[text()='Войти в аккаунт']").click()
+        driver.get(test_url.url_main)
+        driver.find_element(By.XPATH, test_locators.button_signin).click()
         fill_login_fields()
         driver.find_element(By.LINK_TEXT, 'Личный Кабинет').click()
-        assert driver.current_url==test_data.url_account
-        driver.quit()
+        assert driver.current_url==test_url.url_account
 
-    @pytest.mark.parametrize('button', test_data.buttons)
+    @pytest.mark.parametrize('button', test_locators.buttons)
     def test_open_constructor_from_account_page(self,driver,fill_login_fields,button):
-        driver.get(test_data.url_main)
-        driver.find_element(By.XPATH, ".//button[text()='Войти в аккаунт']").click()
+        driver.get(test_url.url_main)
+        driver.find_element(By.XPATH, test_locators.button_signin).click()
         fill_login_fields()
         driver.find_element(By.LINK_TEXT, 'Личный Кабинет').click()
         driver.find_element(By.CSS_SELECTOR,button).click()
-        assert driver.current_url==test_data.url_main
-        driver.quit()
+        assert driver.current_url==test_url.url_main
 
     def test_logout_button(self,driver,fill_login_fields):
-        driver.get(test_data.url_main)
-        driver.find_element(By.XPATH, ".//button[text()='Войти в аккаунт']").click()
-        fill_login_fields()
+        driver.get(test_url.url_main)
+        driver.implicitly_wait(3) #у меня переход по страницам происходил слишком быстро получилось пройти проверку только с неявным ожиданием
+        driver.find_element(By.XPATH, test_locators.button_signin).click()
+        driver.find_element(By.XPATH,test_locators.login_email).send_keys(test_data.email)
+        driver.find_element(By.XPATH,test_locators.login_pass).send_keys(test_data.password)
+        driver.find_element(By.CSS_SELECTOR, test_locators.login_button).click()
         driver.find_element(By.LINK_TEXT, 'Личный Кабинет').click()
-        driver.find_element(By.CSS_SELECTOR,'.Account_button__14Yp3').click()
-        assert driver.current_url==test_data.url_login
-        driver.quit()
+        driver.find_element(By.CSS_SELECTOR,test_locators.button_logout).click()
+        #WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, test_locators.text_vhod))) #явное ожидание текста "вход" на логин странице
+        assert driver.current_url==test_url.url_login
