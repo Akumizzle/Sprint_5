@@ -1,7 +1,4 @@
 from selenium.webdriver.common.by import By
-from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions
 import test_data
 import test_url
 import pytest
@@ -38,5 +35,4 @@ class TestAccountPage:
         driver.find_element(By.CSS_SELECTOR, test_locators.login_button).click()
         driver.find_element(By.LINK_TEXT, 'Личный Кабинет').click()
         driver.find_element(By.CSS_SELECTOR,test_locators.button_logout).click()
-        #WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, test_locators.text_vhod))) #явное ожидание текста "вход" на логин странице
         assert driver.current_url==test_url.url_login
